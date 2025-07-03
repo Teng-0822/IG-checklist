@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IG Checkbox Copier</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen;
+      padding: 16px;
+      margin: 0;
+      background-color: #f9f9f9;
+    }
+    h2 {
+      font-size: 18px;
+      margin-bottom: 10px;
+    }
+    textarea {
+      width: 100%;
+      height: 100px;
+      font-size: 16px;
+      padding: 8px;
+      box-sizing: border-box;
+      margin-bottom: 10px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+    button {
+      font-size: 16px;
+      padding: 10px 15px;
+      margin: 5px 5px 10px 0;
+      border: none;
+      border-radius: 8px;
+      background-color: #007aff;
+      color: white;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #005fc1;
+    }
+    .user-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px;
+      margin-bottom: 5px;
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    .user-row span {
+      flex: 1;
+      font-size: 16px;
+      margin-right: 10px;
+    }
+    .user-row button {
+      font-size: 14px;
+      padding: 6px 10px;
+      background-color: #34c759;
+    }
+    .user-row input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Paste Instagram Usernames</h2>
+  <textarea id="userInput" placeholder="username1&#10;username2&#10;username3"></textarea>
+  <br>
+  <button onclick="generateList()">Generate List</button>
+  <button onclick="copyCheckboxStates()">Copy Checkbox States</button>
+  <button onclick="clearAll()">Clear All</button>
+
+  <div id="userList"></div>
+
+  <script>
+    function generateList() {
+      const input = document.getElementById("userInput").value;
+      const lines = input.split("\n").map(l => l.trim()).filter(Boolean);
+      const container = document.getElementById("userList");
+      container.innerHTML = "";
+
+      // Save input in localStorage
+      localStorage.setItem("userInput", input);
+
+      const checkboxStates = JSON.parse(localStorage.getItem("checkboxStates") || "{}");
+
+      lines.forEach((username, index) => {
+        const row = document.createElement("div");
+        row.className = "user-row";
+
+        const name = document.createElement("span");
+        name.textContent = username;
+
+        const btn = document.createElement("button");
+        btn.textContent = "Open IG";
+        btn.onclick = () => {
+          window.open(`https://instagram.com/${username}`, "_blank");
+        };
+
+        const checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.dataset.index = index;
+        checkbox.checked = checkboxStates[index] || false;
+
+        // Update state on change
+        checkbox.addEventListener("change", () => {
+          checkboxStates[index] = checkbox.checked;
+          localStorage.setItem("checkboxStates", JSON.stringify(checkboxStates));
+        });
+
+        row.appendChild(name);
+        row.appendChild(btn);
+        row.appendChild(checkbox);
+        container.appendChild(row);
+      });
+    }
+
+    function copyCheckboxStates() {
+      const checkboxes = document.querySelectorAll("#userList input[type='checkbox']");
+      const results = Array.from(checkboxes).map(cb => cb.checked ? "TRUE" : "FALSE").join("\n");
+
+      navigator.clipboard.writeText(results).then(() => {
+        alert("Copied TRUE/FALSE values! Paste into Google Sheets.");
+      });
+    }
+
+    function clearAll() {
+      document.getElementById("userInput").value = "";
+      document.getElementById("userList").innerHTML = "";
+      localStorage.removeItem("userInput");
+      localStorage.removeItem("checkboxStates");
+    }
+
+    // Restore saved input and list
+    window.onload = () => {
+      const savedInput = localStorage.getItem("userInput");
+      if (savedInput) {
+        document.getElementById("userInput").value = savedInput;
+        generateList();
+      }
+    };
+  </script>
+
+</body>
+</html>
