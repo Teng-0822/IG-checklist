@@ -70,6 +70,7 @@
   <br>
   <button onclick="generateList()">Generate List</button>
   <button onclick="copyCheckboxStates()">Copy Checkbox States</button>
+  <button onclick="clearAll()">Clear All</button>
 
   <div id="userList"></div>
 
@@ -79,6 +80,11 @@
       const lines = input.split("\n").map(l => l.trim()).filter(Boolean);
       const container = document.getElementById("userList");
       container.innerHTML = "";
+
+      // Save input in localStorage
+      localStorage.setItem("userInput", input);
+
+      const checkboxStates = JSON.parse(localStorage.getItem("checkboxStates") || "{}");
 
       lines.forEach((username, index) => {
         const row = document.createElement("div");
@@ -96,11 +102,17 @@
         const checkbox = document.createElement("input");
         checkbox.type = "checkbox";
         checkbox.dataset.index = index;
+        checkbox.checked = checkboxStates[index] || false;
+
+        // Update state on change
+        checkbox.addEventListener("change", () => {
+          checkboxStates[index] = checkbox.checked;
+          localStorage.setItem("checkboxStates", JSON.stringify(checkboxStates));
+        });
 
         row.appendChild(name);
         row.appendChild(btn);
         row.appendChild(checkbox);
-
         container.appendChild(row);
       });
     }
@@ -113,6 +125,22 @@
         alert("Copied TRUE/FALSE values! Paste into Google Sheets.");
       });
     }
+
+    function clearAll() {
+      document.getElementById("userInput").value = "";
+      document.getElementById("userList").innerHTML = "";
+      localStorage.removeItem("userInput");
+      localStorage.removeItem("checkboxStates");
+    }
+
+    // Restore saved input and list
+    window.onload = () => {
+      const savedInput = localStorage.getItem("userInput");
+      if (savedInput) {
+        document.getElementById("userInput").value = savedInput;
+        generateList();
+      }
+    };
   </script>
 
 </body>
