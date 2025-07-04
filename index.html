@@ -1,162 +1,226 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>IG Checkbox Copier</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mobile Profile Manager</title>
   <style>
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen;
-      padding: 16px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto;
       margin: 0;
-      background-color: #f9f9f9;
-    }
-    h2 {
-      font-size: 18px;
-      margin-bottom: 10px;
-    }
-    textarea {
-      width: 100%;
-      height: 100px;
-      font-size: 16px;
-      padding: 8px;
-      box-sizing: border-box;
-      margin-bottom: 10px;
-      border: 1px solid #ccc;
-      border-radius: 8px;
+      padding: 20px;
+      background: #f2f2f2;
     }
     button {
+      padding: 10px 14px;
       font-size: 16px;
-      padding: 10px 15px;
-      margin: 5px 5px 10px 0;
       border: none;
-      border-radius: 8px;
-      background-color: #007aff;
-      color: white;
+      border-radius: 6px;
+      margin: 5px;
       cursor: pointer;
     }
-    button:hover {
-      background-color: #005fc1;
+    textarea, input[type="file"] {
+      width: 100%;
+      margin-bottom: 10px;
     }
-    .user-row {
+    .nav-btns { display: flex; justify-content: space-between; }
+    .profile-info { font-size: 18px; margin: 10px 0; }
+    .image-container {
       display: flex;
-      align-items: center;
       justify-content: space-between;
-      padding: 10px;
-      margin-bottom: 5px;
-      background-color: white;
+      gap: 4%;
+      margin: 10px 0;
+    }
+    .image-container img {
+      width: 48%;
+      height: 200px;
+      object-fit: cover;
       border-radius: 8px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      background: #ccc;
     }
-    .user-row span {
-      flex: 1;
-      font-size: 16px;
-      margin-right: 10px;
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background-color: rgba(0,0,0,0.6);
+      z-index: 10;
     }
-    .user-row button {
-      font-size: 14px;
-      padding: 6px 10px;
-      background-color: #34c759;
+    .modal-content {
+      background: #fff;
+      margin: 5% auto;
+      padding: 10px;
+      border-radius: 10px;
+      width: 95%;
+      max-height: 80%;
+      overflow-y: auto;
     }
-    .user-row input[type="checkbox"] {
-      width: 20px;
-      height: 20px;
-    }
-    .highlight {
-      background-color: #fff59d !important; /* light yellow */
-    }
+    table { width: 100%; border-collapse: collapse; }
+    td, th { padding: 4px; }
+    p.note { font-size: 13px; color: #888; }
   </style>
 </head>
 <body>
 
-  <h2>Paste Instagram Usernames</h2>
-  <textarea id="userInput" placeholder="username1&#10;username2&#10;username3"></textarea>
-  <br>
-  <button onclick="generateList()">Generate List</button>
-  <button onclick="copyCheckboxStates()">Copy Checkbox States</button>
-  <button onclick="clearAll()">Clear All</button>
+  <div class="nav-btns">
+    <button onclick="prevProfile()">⬅️ Prev</button>
+    <button onclick="nextProfile()">Next ➡️</button>
+  </div>
 
-  <div id="userList"></div>
+  <div class="profile-info" id="profileInfo">username > location (container)</div>
 
-  <script>
-    function generateList() {
-      const input = document.getElementById("userInput").value;
-      const lines = input.split("\n").map(l => l.trim()).filter(Boolean);
-      const container = document.getElementById("userList");
-      container.innerHTML = "";
+  <textarea id="textBox" rows="4" placeholder="Your text will appear here..."></textarea>
 
-      // Save input
-      localStorage.setItem("userInput", input);
-      const checkboxStates = JSON.parse(localStorage.getItem("checkboxStates") || "{}");
-      const lastOpened = localStorage.getItem("lastOpenedIndex");
+  <div class="image-container">
+    <img id="img1" src="">
+    <img id="img2" src="">
+  </div>
 
-      lines.forEach((username, index) => {
-        const row = document.createElement("div");
-        row.className = "user-row";
-        row.dataset.index = index;
+  <button onclick="pickText()">🎲 Pick Text</button>
+  <button onclick="pickImage()">🖼️ Pick Image</button>
+  <button onclick="copyText()">📋 Copy Text</button>
+  <p class="note">🧠 Long press the image to save manually for Threads.</p>
 
-        if (lastOpened == index) {
-          row.classList.add("highlight");
-        }
+  <button onclick="document.getElementById('profileModal').style.display='block'">➕ Add Profiles</button>
+  <button onclick="document.getElementById('textModal').style.display='block'">📝 Add Text Templates</button>
+  <input type="file" accept="image/*" multiple onchange="uploadImages(event)">
 
-        const name = document.createElement("span");
-        name.textContent = username;
+  <!-- Profile Modal -->
+  <div class="modal" id="profileModal">
+    <div class="modal-content">
+      <h3>Paste Profiles</h3>
+      <table id="profileTable"></table>
+      <button onclick="saveProfiles()">✅ Save</button>
+      <button onclick="document.getElementById('profileModal').style.display='none'">❌ Close</button>
+    </div>
+  </div>
 
-        const btn = document.createElement("button");
-        btn.textContent = "Open IG";
-        btn.onclick = () => {
-          window.open(`https://instagram.com/${username}`, "_blank");
+  <!-- Text Modal -->
+  <div class="modal" id="textModal">
+    <div class="modal-content">
+      <h3>Text Templates</h3>
+      <textarea id="textTemplates" rows="10" placeholder="1 text per line..."></textarea>
+      <button onclick="saveTexts()">✅ Save Texts</button>
+      <button onclick="document.getElementById('textModal').style.display='none'">❌ Close</button>
+    </div>
+  </div>
 
-          // Highlight the current row
-          document.querySelectorAll(".user-row").forEach(r => r.classList.remove("highlight"));
-          row.classList.add("highlight");
+<script>
+let profiles = JSON.parse(localStorage.getItem("profiles") || "[]");
+let texts = JSON.parse(localStorage.getItem("texts") || "[]");
+let usedTexts = [], usedImages = [];
+let images = [], currentIndex = 0;
 
-          // Save to localStorage
-          localStorage.setItem("lastOpenedIndex", index);
-        };
+function updateProfile() {
+  if (!profiles.length) return;
+  const p = profiles[currentIndex];
+  document.getElementById("profileInfo").textContent = `${p.username} > ${p.location} (${p.container})`;
+  document.getElementById("textBox").value = "";
+  document.getElementById("img1").src = "";
+  document.getElementById("img2").src = "";
+}
 
-        const checkbox = document.createElement("input");
-        checkbox.type = "checkbox";
-        checkbox.dataset.index = index;
-        checkbox.checked = checkboxStates[index] || false;
+function nextProfile() {
+  if (currentIndex < profiles.length - 1) currentIndex++;
+  usedTexts = []; usedImages = [];
+  updateProfile();
+}
 
-        checkbox.addEventListener("change", () => {
-          checkboxStates[index] = checkbox.checked;
-          localStorage.setItem("checkboxStates", JSON.stringify(checkboxStates));
-        });
+function prevProfile() {
+  if (currentIndex > 0) currentIndex--;
+  usedTexts = []; usedImages = [];
+  updateProfile();
+}
 
-        row.appendChild(name);
-        row.appendChild(btn);
-        row.appendChild(checkbox);
-        container.appendChild(row);
-      });
+function copyText() {
+  const txt = document.getElementById("textBox").value;
+  navigator.clipboard.writeText(txt).then(() => alert("Copied!"));
+}
+
+function pickText() {
+  if (!texts.length) return alert("No texts!");
+  let pool = texts.filter(t => !usedTexts.includes(t));
+  if (!pool.length) usedTexts = [], pool = texts;
+  const pick = pool[Math.floor(Math.random() * pool.length)];
+  usedTexts.push(pick);
+  const loc = profiles[currentIndex].location;
+  document.getElementById("textBox").value = pick.replace("(loc)", loc);
+}
+
+function pickImage() {
+  if (!images.length) return alert("No images!");
+  let pool = images.map((_, i) => i).filter(i => !usedImages.includes(i));
+  if (!pool.length) usedImages = [], pool = images.map((_, i) => i);
+  const idx = pool[Math.floor(Math.random() * pool.length)];
+  usedImages.push(idx);
+  const [img1, img2] = images[idx];
+  document.getElementById("img1").src = img1;
+  document.getElementById("img2").src = img2;
+}
+
+function uploadImages(e) {
+  const files = Array.from(e.target.files);
+  if (files.length % 2 !== 0) return alert("Upload images in sets of 2!");
+  images = [];
+  const readers = files.map(f => new Promise(res => {
+    const r = new FileReader();
+    r.onload = () => res(r.result);
+    r.readAsDataURL(f);
+  }));
+  Promise.all(readers).then(data => {
+    for (let i = 0; i < data.length; i += 2) {
+      images.push([data[i], data[i + 1]]);
     }
+    localStorage.setItem("images", JSON.stringify(images));
+    alert("Images saved!");
+  });
+}
 
-    function copyCheckboxStates() {
-      const checkboxes = document.querySelectorAll("#userList input[type='checkbox']");
-      const results = Array.from(checkboxes).map(cb => cb.checked ? "TRUE" : "FALSE").join("\n");
+function saveTexts() {
+  texts = document.getElementById("textTemplates").value.split(/\r?\n/).filter(Boolean);
+  localStorage.setItem("texts", JSON.stringify(texts));
+  alert("Texts saved!");
+}
 
-      navigator.clipboard.writeText(results).then(() => {
-        alert("Copied TRUE/FALSE values! Paste into Google Sheets.");
-      });
-    }
+function saveProfiles() {
+  profiles = [];
+  for (let i = 0; i < 60; i++) {
+    const u = document.getElementById("u" + i).value;
+    const l = document.getElementById("l" + i).value;
+    const c = document.getElementById("c" + i).value;
+    if (u && l) profiles.push({ username: u, location: l, container: c });
+  }
+  localStorage.setItem("profiles", JSON.stringify(profiles));
+  document.getElementById("profileModal").style.display = "none";
+  updateProfile();
+}
 
-    function clearAll() {
-      document.getElementById("userInput").value = "";
-      document.getElementById("userList").innerHTML = "";
-      localStorage.removeItem("userInput");
-      localStorage.removeItem("checkboxStates");
-      localStorage.removeItem("lastOpenedIndex");
-    }
+function handlePaste(event, type) {
+  event.preventDefault();
+  const paste = (event.clipboardData || window.clipboardData).getData("text");
+  const values = paste.split(/\r?\n|,|\t/).map(v => v.trim()).filter(Boolean);
+  for (let i = 0; i < values.length && i < 60; i++) {
+    document.getElementById(`${type}${i}`).value = values[i];
+  }
+}
 
-    // Load saved data
-    window.onload = () => {
-      const savedInput = localStorage.getItem("userInput");
-      if (savedInput) {
-        document.getElementById("userInput").value = savedInput;
-        generateList();
-      }
-    };
-  </script>
+function buildProfileTable() {
+  const t = document.getElementById("profileTable");
+  t.innerHTML = "";
+  for (let i = 0; i < 60; i++) {
+    const r = document.createElement("tr");
+    r.innerHTML = `
+      <td><input id="u${i}" onpaste="handlePaste(event, 'u')" placeholder="Username"></td>
+      <td><input id="l${i}" onpaste="handlePaste(event, 'l')" placeholder="Location"></td>
+      <td><input id="c${i}" onpaste="handlePaste(event, 'c')" placeholder="Container ID"></td>
+    `;
+    t.appendChild(r);
+  }
+}
+
+// Init
+buildProfileTable();
+images = JSON.parse(localStorage.getItem("images") || "[]");
+updateProfile();
+</script>
 
 </body>
 </html>
