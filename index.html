@@ -61,6 +61,9 @@
       width: 20px;
       height: 20px;
     }
+    .highlight {
+      background-color: #fff59d !important; /* light yellow */
+    }
   </style>
 </head>
 <body>
@@ -81,14 +84,19 @@
       const container = document.getElementById("userList");
       container.innerHTML = "";
 
-      // Save input in localStorage
+      // Save input
       localStorage.setItem("userInput", input);
-
       const checkboxStates = JSON.parse(localStorage.getItem("checkboxStates") || "{}");
+      const lastOpened = localStorage.getItem("lastOpenedIndex");
 
       lines.forEach((username, index) => {
         const row = document.createElement("div");
         row.className = "user-row";
+        row.dataset.index = index;
+
+        if (lastOpened == index) {
+          row.classList.add("highlight");
+        }
 
         const name = document.createElement("span");
         name.textContent = username;
@@ -97,6 +105,13 @@
         btn.textContent = "Open IG";
         btn.onclick = () => {
           window.open(`https://instagram.com/${username}`, "_blank");
+
+          // Highlight the current row
+          document.querySelectorAll(".user-row").forEach(r => r.classList.remove("highlight"));
+          row.classList.add("highlight");
+
+          // Save to localStorage
+          localStorage.setItem("lastOpenedIndex", index);
         };
 
         const checkbox = document.createElement("input");
@@ -104,7 +119,6 @@
         checkbox.dataset.index = index;
         checkbox.checked = checkboxStates[index] || false;
 
-        // Update state on change
         checkbox.addEventListener("change", () => {
           checkboxStates[index] = checkbox.checked;
           localStorage.setItem("checkboxStates", JSON.stringify(checkboxStates));
@@ -131,9 +145,10 @@
       document.getElementById("userList").innerHTML = "";
       localStorage.removeItem("userInput");
       localStorage.removeItem("checkboxStates");
+      localStorage.removeItem("lastOpenedIndex");
     }
 
-    // Restore saved input and list
+    // Load saved data
     window.onload = () => {
       const savedInput = localStorage.getItem("userInput");
       if (savedInput) {
