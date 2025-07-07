@@ -62,7 +62,23 @@
       height: 20px;
     }
     .highlight {
-      background-color: #fff59d !important; /* light yellow */
+      background-color: #fff59d !important;
+    }
+    #navControls {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    #currentUsername {
+      font-weight: bold;
+      font-size: 16px;
+    }
+    label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
   </style>
 </head>
@@ -75,18 +91,30 @@
   <button onclick="copyCheckboxStates()">Copy Checkbox States</button>
   <button onclick="clearAll()">Clear All</button>
 
+  <!-- Navigation Controls -->
+  <div id="navControls">
+    <button onclick="prevUser()">⬅️ Prev</button>
+    <span id="currentUsername">—</span>
+    <button onclick="openCurrentIG()">Open IG</button>
+    <label><input type="checkbox" id="currentCheckbox"> ✅</label>
+    <button onclick="nextUser()">Next ➡️</button>
+  </div>
+
   <div id="userList"></div>
 
   <script>
+    let currentIndex = 0;
+    let currentUsers = [];
+    let checkboxStates = {};
+
     function generateList() {
       const input = document.getElementById("userInput").value;
       const lines = input.split("\n").map(l => l.trim()).filter(Boolean);
       const container = document.getElementById("userList");
       container.innerHTML = "";
 
-      // Save input
       localStorage.setItem("userInput", input);
-      const checkboxStates = JSON.parse(localStorage.getItem("checkboxStates") || "{}");
+      checkboxStates = JSON.parse(localStorage.getItem("checkboxStates") || "{}");
       const lastOpened = localStorage.getItem("lastOpenedIndex");
 
       lines.forEach((username, index) => {
@@ -105,13 +133,7 @@
         btn.textContent = "Open IG";
         btn.onclick = () => {
           window.open(`https://instagram.com/${username}`, "_blank");
-
-          // Highlight the current row
-          document.querySelectorAll(".user-row").forEach(r => r.classList.remove("highlight"));
-          row.classList.add("highlight");
-
-          // Save to localStorage
-          localStorage.setItem("lastOpenedIndex", index);
+          highlightRow(index);
         };
 
         const checkbox = document.createElement("input");
@@ -129,12 +151,56 @@
         row.appendChild(checkbox);
         container.appendChild(row);
       });
+
+      currentUsers = lines;
+      currentIndex = parseInt(localStorage.getItem("lastOpenedIndex")) || 0;
+      updateCurrentView();
     }
+
+    function updateCurrentView() {
+      const username = currentUsers[currentIndex];
+      document.getElementById("currentUsername").textContent = username || "—";
+      document.getElementById("currentCheckbox").checked = checkboxStates[currentIndex] || false;
+    }
+
+    function highlightRow(index) {
+      document.querySelectorAll(".user-row").forEach(r => r.classList.remove("highlight"));
+      const target = document.querySelector(`.user-row[data-index="${index}"]`);
+      if (target) target.classList.add("highlight");
+      localStorage.setItem("lastOpenedIndex", index);
+    }
+
+    function prevUser() {
+      if (currentIndex > 0) {
+        currentIndex--;
+        updateCurrentView();
+      }
+    }
+
+    function nextUser() {
+      if (currentIndex < currentUsers.length - 1) {
+        currentIndex++;
+        updateCurrentView();
+      }
+    }
+
+    function openCurrentIG() {
+      const username = currentUsers[currentIndex];
+      if (username) {
+        window.open(`https://instagram.com/${username}`, "_blank");
+        highlightRow(currentIndex);
+      }
+    }
+
+    document.getElementById("currentCheckbox").addEventListener("change", () => {
+      checkboxStates[currentIndex] = document.getElementById("currentCheckbox").checked;
+      localStorage.setItem("checkboxStates", JSON.stringify(checkboxStates));
+      generateList(); // refresh list checkboxes
+    });
 
     function copyCheckboxStates() {
       const checkboxes = document.querySelectorAll("#userList input[type='checkbox']");
       const results = Array.from(checkboxes).map(cb => cb.checked ? "TRUE" : "FALSE").join("\n");
-
       navigator.clipboard.writeText(results).then(() => {
         alert("Copied TRUE/FALSE values! Paste into Google Sheets.");
       });
@@ -146,9 +212,11 @@
       localStorage.removeItem("userInput");
       localStorage.removeItem("checkboxStates");
       localStorage.removeItem("lastOpenedIndex");
+      currentUsers = [];
+      currentIndex = 0;
+      document.getElementById("currentUsername").textContent = "—";
     }
 
-    // Load saved data
     window.onload = () => {
       const savedInput = localStorage.getItem("userInput");
       if (savedInput) {
