@@ -1,110 +1,104 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
   <title>IG Checkbox Copier</title>
   <style>
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen;
-      padding: 16px;
-      margin: 0;
-      background-color: #f9f9f9;
-    }
-    h2 {
-      font-size: 18px;
-      margin-bottom: 10px;
-    }
-    textarea {
-      width: 100%;
-      height: 100px;
-      font-size: 16px;
-      padding: 8px;
-      box-sizing: border-box;
-      margin-bottom: 10px;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-    }
-    button {
-      font-size: 16px;
-      padding: 10px 15px;
-      margin: 5px 5px 10px 0;
-      border: none;
-      border-radius: 8px;
-      background-color: #007aff;
-      color: white;
-      cursor: pointer;
-      white-space: nowrap;
-    }
-    button:hover {
-      background-color: #005fc1;
-    }
-    .user-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 10px;
-      margin-bottom: 5px;
-      background-color: white;
-      border-radius: 8px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-    }
-    .user-row span {
-      flex: 1;
-      font-size: 16px;
-      margin-right: 10px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-    .user-row button {
-      font-size: 14px;
-      padding: 6px 10px;
-      background-color: #34c759;
-    }
-    .user-row input[type="checkbox"] {
-      width: 24px;
-      height: 24px;
-    }
-    .highlight {
-      background-color: #fff59d !important;
-    }
-    #navControls {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 20px;
-      flex-wrap: wrap;
-      padding: 10px;
-      background: #ffffff;
-      border-radius: 8px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-      position: sticky;
-      top: 0;
-      z-index: 10;
-    }
-    #currentUsername {
-      font-weight: bold;
-      font-size: 16px;
-      width: 120px; /* shorter width */
-      overflow: hidden;
-      white-space: nowrap;
-      text-overflow: ellipsis;
-      background-color: #e0e0e0;
-      padding: 6px 10px;
-      border-radius: 6px;
-      text-align: center;
-      flex-shrink: 0;
-  
-    /* fade effect */
-    -webkit-mask-image: linear-gradient(to right, black 70%, transparent);
-    mask-image: linear-gradient(to right, black 70%, transparent);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen;
+    padding: 16px;
+    margin: 0;
+    background-color: #f9f9f9;
   }
-    label {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      flex-shrink: 0;
-    }
+  h2 {
+    font-size: 18px;
+    margin-bottom: 10px;
+  }
+  textarea {
+    width: 100%;
+    height: 100px;
+    font-size: 16px;
+    padding: 8px;
+    box-sizing: border-box;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+  }
+  button {
+    font-size: 16px;
+    padding: 10px 15px;
+    margin: 5px 5px 10px 0;
+    border: none;
+    border-radius: 8px;
+    background-color: #007aff;
+    color: white;
+    cursor: pointer;
+  }
+  button:hover {
+    background-color: #005fc1;
+  }
+  .user-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px;
+    margin-bottom: 5px;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  }
+  .user-row span {
+    flex: 1;
+    font-size: 16px;
+    margin-right: 10px;
+  }
+  .user-row button {
+    font-size: 14px;
+    padding: 6px 10px;
+    background-color: #34c759;
+  }
+  .user-row input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+  }
+  .highlight {
+    background-color: #fff59d !important;
+  }
+
+  #navControls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: nowrap;
+    overflow: hidden;
+  }
+
+  #currentUsername {
+    font-weight: bold;
+    font-size: 16px;
+    width: 120px; /* shorter width */
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    background-color: #e0e0e0;
+    padding: 6px 10px;
+    border-radius: 6px;
+    text-align: center;
+    flex-shrink: 0;
+
+  /* fade effect */
+  -webkit-mask-image: linear-gradient(to right, black 70%, transparent);
+  mask-image: linear-gradient(to right, black 70%, transparent);
+  }
+
+  label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+  }
 
     label input[type="checkbox"] {
       transform: scale(2);
@@ -124,13 +118,11 @@
 
   <!-- Navigation Controls -->
   <div id="navControls">
-    <button onclick="prevUser()">⬅️</button>
+    <button onclick="prevUser(); openCurrentIG()">⬅️</button>
     <span id="currentUsername">—</span>
     <button onclick="openCurrentIG()">Go-IG</button>
-    <label>
-      <input type="checkbox" id="currentCheckbox">
-    </label>
-    <button onclick="nextUser()">➡️</button>
+    <label><input type="checkbox" id="currentCheckbox"></label>
+    <button onclick="nextUser(); openCurrentIG()">➡️</button>
   </div>
 
   <div id="userList"></div>
@@ -167,8 +159,6 @@
         btn.onclick = () => {
           window.open(`https://instagram.com/${username}`, "_blank");
           highlightRow(index);
-          currentIndex = index;
-          updateCurrentView();
         };
 
         const checkbox = document.createElement("input");
@@ -196,7 +186,6 @@
       const username = currentUsers[currentIndex];
       document.getElementById("currentUsername").textContent = username || "—";
       document.getElementById("currentCheckbox").checked = checkboxStates[currentIndex] || false;
-      highlightRow(currentIndex);
     }
 
     function highlightRow(index) {
@@ -231,11 +220,11 @@
     document.getElementById("currentCheckbox").addEventListener("change", () => {
       checkboxStates[currentIndex] = document.getElementById("currentCheckbox").checked;
       localStorage.setItem("checkboxStates", JSON.stringify(checkboxStates));
-      // Removed generateList() to avoid UI delay
+      generateList(); // refresh list checkboxes
     });
 
     function copyCheckboxStates() {
-      const checkboxes = document.querySelectorAll("#userList input[type='checkbox']`);
+      const checkboxes = document.querySelectorAll("#userList input[type='checkbox']");
       const results = Array.from(checkboxes).map(cb => cb.checked ? "TRUE" : "FALSE").join("\n");
       navigator.clipboard.writeText(results).then(() => {
         alert("Copied TRUE/FALSE values! Paste into Google Sheets.");
