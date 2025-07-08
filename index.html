@@ -113,14 +113,14 @@
   <textarea id="userInput" placeholder="username1&#10;username2&#10;username3"></textarea>
   <br>
   <button onclick="generateList()">Generate List</button>
-  <button onclick="copyCheckboxStates()">Copy Checkbox States</button>
+  <button onclick="copyCheckboxStates()">Copybox</button>
   <button onclick="clearAll()">Clear All</button>
 
   <!-- Navigation Controls -->
   <div id="navControls">
     <button onclick="prevUser(); openCurrentIG()">⬅️</button>
     <span id="currentUsername">—</span>
-    <button onclick="openCurrentIG()">Go-IG</button>
+    <button onclick="openCurrentIG()">IG</button>
     <label><input type="checkbox" id="currentCheckbox"></label>
     <button onclick="nextUser(); openCurrentIG()">➡️</button>
   </div>
@@ -218,10 +218,15 @@
     }
 
     document.getElementById("currentCheckbox").addEventListener("change", () => {
-      checkboxStates[currentIndex] = document.getElementById("currentCheckbox").checked;
-      localStorage.setItem("checkboxStates", JSON.stringify(checkboxStates));
-      generateList(); // refresh list checkboxes
-    });
+  checkboxStates[currentIndex] = document.getElementById("currentCheckbox").checked;
+  localStorage.setItem("checkboxStates", JSON.stringify(checkboxStates));
+
+  // ✅ Also update the corresponding checkbox in the list (no full rebuild)
+  const rowCheckbox = document.querySelector(`.user-row input[data-index="${currentIndex}"]`);
+  if (rowCheckbox) {
+    rowCheckbox.checked = document.getElementById("currentCheckbox").checked;
+  }
+});
 
     function copyCheckboxStates() {
       const checkboxes = document.querySelectorAll("#userList input[type='checkbox']");
