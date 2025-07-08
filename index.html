@@ -85,17 +85,32 @@
     #currentUsername {
       font-weight: bold;
       font-size: 16px;
-      max-width: 150px;
+      width: 120px; /* shorter width */
       overflow: hidden;
-      text-overflow: ellipsis;
       white-space: nowrap;
-    }
+      text-overflow: ellipsis;
+      background-color: #e0e0e0;
+      padding: 6px 10px;
+      border-radius: 6px;
+      text-align: center;
+      flex-shrink: 0;
+  
+    /* fade effect */
+    -webkit-mask-image: linear-gradient(to right, black 70%, transparent);
+    mask-image: linear-gradient(to right, black 70%, transparent);
+  }
     label {
       display: flex;
       align-items: center;
       gap: 6px;
       flex-shrink: 0;
     }
+
+    label input[type="checkbox"] {
+      transform: scale(2);
+      cursor: pointer;
+    }
+    
   </style>
 </head>
 <body>
