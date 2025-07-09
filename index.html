@@ -118,9 +118,11 @@
   <h2>Paste Instagram Usernames</h2>
   <textarea id="userInput" placeholder="username1&#10;username2&#10;username3"></textarea>
   <br>
-  <button onclick="generateList()">Generate List</button>
+  <button onclick="generateList()">Generate</button>
   <button onclick="copyCheckboxStates()">Copybox</button>
   <button onclick="clearAll()">Clear All</button>
+  <button onclick="undoClear()">Undo</button>
+
 
   <!-- Navigation Controls -->
   <div id="navControls">
@@ -260,6 +262,37 @@
         generateList();
       }
     };
+    function undoClear() {
+      const backupInput = localStorage.getItem("backupUserInput");
+      const backupCheckboxes = localStorage.getItem("backupCheckboxStates");
+      const backupIndex = localStorage.getItem("backupLastOpenedIndex");
+    
+      if (backupInput) {
+        localStorage.setItem("userInput", backupInput);
+        localStorage.setItem("checkboxStates", backupCheckboxes);
+        localStorage.setItem("lastOpenedIndex", backupIndex);
+        generateList();
+        alert("Undo complete!");
+      } else {
+        alert("No backup found!");
+      }
+    }
+    function clearAll() {
+  // Save backups before clearing
+      localStorage.setItem("backupUserInput", localStorage.getItem("userInput"));
+      localStorage.setItem("backupCheckboxStates", localStorage.getItem("checkboxStates"));
+      localStorage.setItem("backupLastOpenedIndex", localStorage.getItem("lastOpenedIndex"));
+    
+      // Now clear
+      document.getElementById("userInput").value = "";
+      document.getElementById("userList").innerHTML = "";
+      localStorage.removeItem("userInput");
+      localStorage.removeItem("checkboxStates");
+      localStorage.removeItem("lastOpenedIndex");
+      currentUsers = [];
+      currentIndex = 0;
+      document.getElementById("currentUsername").textContent = "—";
+    }
   </script>
 
 </body>
