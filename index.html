@@ -268,9 +268,15 @@
       const backupIndex = localStorage.getItem("backupLastOpenedIndex");
     
       if (backupInput) {
+        // Restore backups to localStorage
         localStorage.setItem("userInput", backupInput);
         localStorage.setItem("checkboxStates", backupCheckboxes);
         localStorage.setItem("lastOpenedIndex", backupIndex);
+    
+        // Also restore the textarea so generateList() works correctly
+        document.getElementById("userInput").value = backupInput;
+    
+        // Then regenerate the list
         generateList();
         alert("Undo complete!");
       } else {
