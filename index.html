@@ -318,51 +318,76 @@
       document.getElementById("currentUsername").textContent = "—";
     }
 // last update
-    let counterValue = 0;
+     let counterValue = 0;
+  let countingEnabled = true;
 
-  function updateFloatingCounterDisplay() {
-    const circle = document.getElementById("floatingCounter");
-    circle.textContent = counterValue;
-    if (counterValue >= 9) {
-      circle.style.backgroundColor = "red";
-    } else {
-      circle.style.backgroundColor = "#34c759";
-    }
-  }
-
-  function attachCounterListeners() {
-    document.querySelectorAll("#userList input[type='checkbox']").forEach((cb, index) => {
-      cb.addEventListener("change", () => {
-        counterValue = document.querySelectorAll("#userList input[type='checkbox']:checked").length;
-        updateFloatingCounterDisplay();
-      });
-    });
-    document.getElementById("currentCheckbox").addEventListener("change", () => {
-      counterValue = document.querySelectorAll("#userList input[type='checkbox']:checked").length;
-      updateFloatingCounterDisplay();
-    });
-  }
-
-  const originalGenerateList = generateList;
-  generateList = function () {
-    originalGenerateList();
-    counterValue = document.querySelectorAll("#userList input[type='checkbox']:checked").length;
-    updateFloatingCounterDisplay();
-    attachCounterListeners();
-  };
-
-  // Ensure it's updated on load
-  window.addEventListener("load", () => {
-    setTimeout(() => {
-      counterValue = document.querySelectorAll("#userList input[type='checkbox']:checked").length;
-      updateFloatingCounterDisplay();
-    }, 100);
+  // Create the floating counter if not already done
+  window.addEventListener("DOMContentLoaded", () => {
+    const counter = document.createElement("div");
+    counter.id = "floatingCounter";
+    counter.style.position = "fixed";
+    counter.style.bottom = "20px";
+    counter.style.left = "20px";
+    counter.style.width = "50px";
+    counter.style.height = "50px";
+    counter.style.borderRadius = "50%";
+    counter.style.backgroundColor = "green";
+    counter.style.color = "white";
+    counter.style.display = "flex";
+    counter.style.justifyContent = "center";
+    counter.style.alignItems = "center";
+    counter.style.fontWeight = "bold";
+    counter.style.fontSize = "20px";
+    counter.style.zIndex = "9999";
+    counter.textContent = "0";
+    document.body.appendChild(counter);
   });
 
+  function updateFloatingCounterDisplay() {
+    const el = document.getElementById("floatingCounter");
+    if (!el) return;
+
+    el.textContent = counterValue;
+    el.style.backgroundColor = counterValue >= 9 ? "red" : "green";
+  }
+
+  function setupCounterTracking() {
+    document.querySelectorAll("#userList input[type='checkbox']").forEach(cb => {
+      cb.addEventListener("change", () => {
+        if (countingEnabled) {
+            if (cb.checked) {
+              counterValue++;
+            } else {
+              counterValue = Math.max(0, counterValue - 1); // prevent negative values
+            }
+            updateFloatingCounterDisplay();
+          }
+      });
+    });
+
+    document.getElementById("currentCheckbox").addEventListener("change", () => {
+  if (countingEnabled) {
+    if (document.getElementById("currentCheckbox").checked) {
+      counterValue++;
+    } else {
+      counterValue = Math.max(0, counterValue - 1);
+    }
+    updateFloatingCounterDisplay();
+  }
+});
+  }
+
+  // Reset counter to 0 and ignore all pre-checked boxes
   function resetCounter() {
-  counterValue = 0;
-  updateFloatingCounterDisplay();
-}
+    counterValue = 0;
+    updateFloatingCounterDisplay();
+    countingEnabled = false;
+
+    // Re-enable counting after a short delay to ignore initial checkbox change events
+    setTimeout(() => {
+      countingEnabled = true;
+    }, 200);
+  }
     
   </script>
 
