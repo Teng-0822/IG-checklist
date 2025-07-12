@@ -111,22 +111,22 @@
       cursor: pointer;
     }
 
-    #floatingCounter {
+   #floatingCounter {
     position: fixed;
     bottom: 20px;
     left: 20px;
-    width: 60px;
-    height: 60px;
-    background-color: #34c759;
+    width: 50px;
+    height: 50px;
+    background-color: green;
     color: white;
+    font-size: 20px;
     font-weight: bold;
-    font-size: 24px;
     border-radius: 50%;
     display: flex;
-    align-items: center;
     justify-content: center;
+    align-items: center;
     z-index: 9999;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
   }
   </style>
 </head>
@@ -318,80 +318,42 @@
       document.getElementById("currentUsername").textContent = "—";
     }
 // last update
-       // Floating counter UI setup
-  const floatingCounter = document.createElement("div");
-  floatingCounter.id = "floatingCounter";
-  floatingCounter.style.position = "fixed";
-  floatingCounter.style.bottom = "20px";
-  floatingCounter.style.left = "20px";
-  floatingCounter.style.width = "60px";
-  floatingCounter.style.height = "60px";
-  floatingCounter.style.borderRadius = "50%";
-  floatingCounter.style.backgroundColor = "#34c759";
-  floatingCounter.style.color = "white";
-  floatingCounter.style.display = "flex";
-  floatingCounter.style.alignItems = "center";
-  floatingCounter.style.justifyContent = "center";
-  floatingCounter.style.fontSize = "24px";
-  floatingCounter.style.fontWeight = "bold";
-  floatingCounter.style.zIndex = "9999";
-  document.body.appendChild(floatingCounter);
+ let counterValue = parseInt(localStorage.getItem("navCounter") || "0");
 
-  let counterValue = 0;
-  let countingEnabled = true;
+  const counterElement = document.getElementById("floatingCounter");
+  const navCheckbox = document.getElementById("currentCheckbox");
 
-  function updateFloatingCounterDisplay() {
-    floatingCounter.textContent = counterValue;
+  function updateCounterDisplay() {
+    counterElement.textContent = counterValue;
     if (counterValue >= 9) {
-      floatingCounter.style.backgroundColor = "red";
+      counterElement.style.backgroundColor = "red";
     } else {
-      floatingCounter.style.backgroundColor = "#34c759";
+      counterElement.style.backgroundColor = "green";
     }
+    localStorage.setItem("navCounter", counterValue);
   }
 
-  function resetCounterOnly() {
-    counterValue = 0;
-    countingEnabled = true;
-    updateFloatingCounterDisplay();
-  }
-
-  // Button beside Undo
-  const resetBtn = document.createElement("button");
-  resetBtn.textContent = "Reset Count";
-  resetBtn.onclick = resetCounterOnly;
-  document.querySelector("button[onclick='undoClear()']").insertAdjacentElement("afterend", resetBtn);
-
-  // Add counting behavior
- function setupCounterTracking() {
-  document.querySelectorAll("#userList input[type='checkbox']").forEach(cb => {
-    cb.addEventListener("change", (e) => {
-      if (countingEnabled) {
-        if (cb.checked) {
-          counterValue++;
-        } else {
-          counterValue = Math.max(0, counterValue - 1);
-        }
-        updateFloatingCounterDisplay();
-      }
-
-      // Sync nav checkbox without triggering another count
-      const index = cb.dataset.index;
-      if (index == currentIndex) {
-        document.getElementById("currentCheckbox").checked = cb.checked;
-      }
-    });
+  // Handle checkbox change
+  navCheckbox.addEventListener("change", () => {
+    if (navCheckbox.checked) {
+      counterValue++;
+    } else {
+      counterValue = Math.max(0, counterValue - 1);
+    }
+    updateCounterDisplay();
   });
-}
-  // Call it after list is generated
-  const originalGenerateList = generateList;
-  generateList = function () {
-    originalGenerateList();
-    setupCounterTracking();
-  }
 
-  // Init counter on load
-  updateFloatingCounterDisplay();
+  // Reset button beside Undo
+  const resetBtn = document.createElement("button");
+  resetBtn.textContent = "🔄";
+  resetBtn.onclick = () => {
+    counterValue = 0;
+    updateCounterDisplay();
+  };
+  document.querySelector("button[onclick='undoClear()']").after(resetBtn);
 
+  // Show correct value on load
+  updateCounterDisplay();
   // Reset counter to 0 and ignore all pre-checked boxes
   function resetCounter() {
     counterValue = 0;
