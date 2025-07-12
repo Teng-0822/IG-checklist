@@ -110,7 +110,24 @@
       margin-right: 8px;
       cursor: pointer;
     }
-    
+
+    #floatingCounter {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    width: 60px;
+    height: 60px;
+    background-color: #34c759;
+    color: white;
+    font-weight: bold;
+    font-size: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+  }
   </style>
 </head>
 <body>
@@ -122,6 +139,7 @@
   <button onclick="copyCheckboxStates()">📋</button>
   <button onclick="clearAll()">🗑️</button>
   <button onclick="undoClear()">🔙</button>
+  <button onclick="resetCounter()">🔄</button>
 
 
   <!-- Navigation Controls -->
@@ -299,6 +317,53 @@
       currentIndex = 0;
       document.getElementById("currentUsername").textContent = "—";
     }
+// last update
+    let counterValue = 0;
+
+  function updateFloatingCounterDisplay() {
+    const circle = document.getElementById("floatingCounter");
+    circle.textContent = counterValue;
+    if (counterValue >= 9) {
+      circle.style.backgroundColor = "red";
+    } else {
+      circle.style.backgroundColor = "#34c759";
+    }
+  }
+
+  function attachCounterListeners() {
+    document.querySelectorAll("#userList input[type='checkbox']").forEach((cb, index) => {
+      cb.addEventListener("change", () => {
+        counterValue = document.querySelectorAll("#userList input[type='checkbox']:checked").length;
+        updateFloatingCounterDisplay();
+      });
+    });
+    document.getElementById("currentCheckbox").addEventListener("change", () => {
+      counterValue = document.querySelectorAll("#userList input[type='checkbox']:checked").length;
+      updateFloatingCounterDisplay();
+    });
+  }
+
+  const originalGenerateList = generateList;
+  generateList = function () {
+    originalGenerateList();
+    counterValue = document.querySelectorAll("#userList input[type='checkbox']:checked").length;
+    updateFloatingCounterDisplay();
+    attachCounterListeners();
+  };
+
+  // Ensure it's updated on load
+  window.addEventListener("load", () => {
+    setTimeout(() => {
+      counterValue = document.querySelectorAll("#userList input[type='checkbox']:checked").length;
+      updateFloatingCounterDisplay();
+    }, 100);
+  });
+
+  function resetCounter() {
+  counterValue = 0;
+  updateFloatingCounterDisplay();
+}
+    
   </script>
 
 </body>
