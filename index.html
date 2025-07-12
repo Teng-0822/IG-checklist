@@ -139,7 +139,6 @@
   <button onclick="copyCheckboxStates()">📋</button>
   <button onclick="clearAll()">🗑️</button>
   <button onclick="undoClear()">🔙</button>
-  <button onclick="resetCounter()">🔄</button>
 
 
   <!-- Navigation Controls -->
@@ -354,17 +353,7 @@
 
   // Show correct value on load
   updateCounterDisplay();
-  // Reset counter to 0 and ignore all pre-checked boxes
-  function resetCounter() {
-    counterValue = 0;
-    updateFloatingCounterDisplay();
-    countingEnabled = false;
 
-    // Re-enable counting after a short delay to ignore initial checkbox change events
-    setTimeout(() => {
-      countingEnabled = true;
-    }, 200);
-  }
     
   </script>
 
