@@ -362,32 +362,26 @@
   document.querySelector("button[onclick='undoClear()']").insertAdjacentElement("afterend", resetBtn);
 
   // Add counting behavior
-  function setupCounterTracking() {
-    document.querySelectorAll("input[type='checkbox']").forEach(cb => {
-      cb.addEventListener("change", () => {
-        if (countingEnabled) {
-          if (cb.checked) {
-            counterValue++;
-          } else {
-            counterValue = Math.max(0, counterValue - 1);
-          }
-          updateFloatingCounterDisplay();
-        }
-      });
-    });
-
-    document.getElementById("currentCheckbox").addEventListener("change", () => {
+ function setupCounterTracking() {
+  document.querySelectorAll("#userList input[type='checkbox']").forEach(cb => {
+    cb.addEventListener("change", (e) => {
       if (countingEnabled) {
-        if (document.getElementById("currentCheckbox").checked) {
+        if (cb.checked) {
           counterValue++;
         } else {
           counterValue = Math.max(0, counterValue - 1);
         }
         updateFloatingCounterDisplay();
       }
-    });
-  }
 
+      // Sync nav checkbox without triggering another count
+      const index = cb.dataset.index;
+      if (index == currentIndex) {
+        document.getElementById("currentCheckbox").checked = cb.checked;
+      }
+    });
+  });
+}
   // Call it after list is generated
   const originalGenerateList = generateList;
   generateList = function () {
