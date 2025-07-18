@@ -273,12 +273,24 @@
     }
 
     window.onload = () => {
-      const savedInput = localStorage.getItem("userInput");
-      if (savedInput) {
-        document.getElementById("userInput").value = savedInput;
-        generateList();
-      }
-    };
+  const savedInput = localStorage.getItem("userInput");
+  if (savedInput) {
+    document.getElementById("userInput").value = savedInput;
+    generateList();
+  }
+
+  // Attach sound to buttons
+  document.querySelectorAll("button").forEach(btn => {
+    btn.addEventListener("click", playClickSound);
+  });
+
+  // Attach sound to all checkboxes (current + list ones)
+  document.addEventListener("change", function(e) {
+    if (e.target.type === "checkbox") {
+      playClickSound();
+    }
+  });
+};
     function undoClear() {
       const backupInput = localStorage.getItem("backupUserInput");
       const backupCheckboxes = localStorage.getItem("backupCheckboxStates");
@@ -354,8 +366,17 @@
   // Show correct value on load
   updateCounterDisplay();
 
-    
+  const clickSound = document.getElementById("clickSound");
+
+function playClickSound() {
+  if (clickSound) {
+    clickSound.currentTime = 0;
+    clickSound.play();
+  }
+}
+  
   </script>
+<audio id="clickSound" src="data:audio/mp3;base64,//uQxAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAACcQCA..." preload="auto"></audio>
 
 </body>
 </html>
