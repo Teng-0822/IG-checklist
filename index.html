@@ -106,9 +106,16 @@
     padding: 6px 10px;
     border-radius: 6px;
     text-align: center;
+  
     writing-mode: vertical-rl;
     text-orientation: upright;
     line-height: 1.2;
+  
+    height: 120px;                    /* Fixed height */
+    overflow: hidden;
+    position: relative;
+    mask-image: linear-gradient(to top, transparent 0%, black 30%, black 70%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to top, transparent 0%, black 30%, black 70%, transparent 100%);
   }
 
   label {
