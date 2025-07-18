@@ -369,14 +369,17 @@
   const clickSound = document.getElementById("clickSound");
 
 function playClickSound() {
+  const clickSound = document.getElementById("clickSound");
   if (clickSound) {
     clickSound.currentTime = 0;
-    clickSound.play();
+    clickSound.play().catch(() => {}); // suppress Safari warning if blocked
   }
 }
   
   </script>
-<audio id="clickSound" src="data:audio/mp3;base64,//uQxAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAACcQCA..." preload="auto"></audio>
+<audio id="clickSound" preload="auto">
+    <source src="data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAABCxAgAEABAAZGF0YQgAAAAA/////wAAAP///wAAAP///w==" type="audio/wav">
+  </audio>
 
 </body>
 </html>
