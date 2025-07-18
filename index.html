@@ -73,18 +73,29 @@
   }
 
   #navControls {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    background: white;
+    border-radius: 12px;
+    padding: 12px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
     display: flex;
+    flex-direction: column;
     align-items: center;
-    gap: 10px;
-    margin-bottom: 20px;
-    flex-wrap: nowrap;
-    overflow: hidden;
+    gap: 8px;
+    z-index: 999;
   }
 
+  #leftNav {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
   #currentUsername {
     font-weight: bold;
     font-size: 16px;
-    width: 120px; /* shorter width */
+    width: 120px;
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
@@ -92,11 +103,8 @@
     padding: 6px 10px;
     border-radius: 6px;
     text-align: center;
-    flex-shrink: 0;
-
-  /* fade effect */
-  -webkit-mask-image: linear-gradient(to right, black 70%, transparent);
-  mask-image: linear-gradient(to right, black 70%, transparent);
+    -webkit-mask-image: linear-gradient(to right, black 70%, transparent);
+    mask-image: linear-gradient(to right, black 70%, transparent);
   }
 
   label {
@@ -143,12 +151,12 @@
 
   <!-- Navigation Controls -->
   <div id="navControls">
-    <button onclick="prevUser(); openCurrentIG()">⬅️</button>
-    <span id="currentUsername">—</span>
-    <button onclick="openCurrentIG()">IG</button>
-    <label><input type="checkbox" id="currentCheckbox"></label>
-    <button onclick="nextUser(); openCurrentIG()">➡️</button>
-  </div>
+  <button onclick="prevUser(); openCurrentIG()">⬅️</button>
+  <span id="currentUsername">—</span>
+  <button onclick="openCurrentIG()">IG</button>
+  <label><input type="checkbox" id="currentCheckbox"></label>
+  <button onclick="nextUser(); openCurrentIG()">➡️</button>
+</div>
   <div id="floatingCounter">0</div>
   <div id="userList"></div>
 
@@ -196,9 +204,9 @@
           localStorage.setItem("checkboxStates", JSON.stringify(checkboxStates));
         });
 
-        row.appendChild(name);
         row.appendChild(btn);
         row.appendChild(checkbox);
+        row.appendChild(name);
         container.appendChild(row);
       });
 
